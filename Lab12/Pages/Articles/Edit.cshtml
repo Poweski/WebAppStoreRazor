@@ -1,0 +1,82 @@
+﻿@page
+@model Lab12.Pages.Articles.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Article.Id" />
+
+            <div class="form-group">
+                <label asp-for="Article.Name" class="control-label"></label>
+                <input asp-for="Article.Name" class="form-control form-control" style="width: 100%;" />
+                <span asp-validation-for="Article.Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Article.Price" class="control-label"></label>
+                <input asp-for="Article.Price" class="form-control form-control" style="width: 100%;" />
+                <span asp-validation-for="Article.Price" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Article.CategoryId" class="control-label">Category</label>
+                <select asp-for="Article.CategoryId" class="form-select form-control-lg" style="width: 100%;">
+                    <option value="" disabled selected>Select a category</option> 
+                    @if (ViewBag.Categories != null)
+                    {
+                        foreach (var category in (Dictionary<int, string>)ViewBag.Categories)
+                        {
+                            if (Model.Article.CategoryId == category.Key)
+                            {
+                                <option value="@category.Key" selected>@category.Value</option>
+                            }
+                            else
+                            {
+                                <option value="@category.Key">@category.Value</option>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <option disabled>No categories available</option>
+                    }
+                </select>
+                <span asp-validation-for="Article.CategoryId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Article.ImagePath" class="control-label">Image</label>
+                @if (Model != null && !string.IsNullOrEmpty(Model.Article.ImagePath))
+                {
+                    <img class="margin-top" src="@Model.Article.ImagePath" alt="Image not available" style="max-width: 200px; max-height: 200px;" />
+                }
+                else
+                {
+                    <p>No image available</p>
+                }
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-success margin-top" style="width: 150px;" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="/Store/Index" class="btn btn-primary margin-top" style="width: 150px;">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

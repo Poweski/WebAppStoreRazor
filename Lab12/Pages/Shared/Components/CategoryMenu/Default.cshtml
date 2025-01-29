@@ -1,0 +1,24 @@
+﻿<form method="get" asp-page="/Store/Index" class="d-flex align-items-center">
+    <select id="category-select" name="categoryId" class="form-select" onchange="this.form.submit();">
+        <option value="">All categories</option>
+        @if (ViewData["Categories"] != null)
+        {
+            var categories = (Dictionary<int, string>)ViewData["Categories"];
+            foreach (var category in categories)
+            {
+                if (ViewBag.SelectedCategoryId != null && (int)ViewBag.SelectedCategoryId == category.Key)
+                {
+                    <option value="@category.Key" selected>@category.Value</option>
+                }
+                else
+                {
+                    <option value="@category.Key">@category.Value</option>
+                }
+            }
+        }
+        else
+        {
+            <option disabled>No categories</option>
+        }
+    </select>
+</form>

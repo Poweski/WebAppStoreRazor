@@ -1,0 +1,84 @@
+﻿@page
+@model Lab12.Pages.Store.CartModel
+
+@{
+    ViewData["Title"] = "Cart";
+}
+
+@if (!Model.Articles.Any())
+{
+    <p style="font-size: 20px;">No articles in cart</p>
+}
+else
+{
+    <h1>Cart</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Category</th>
+                <th>Image</th>
+                <th>Amount</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var article in Model.Articles)
+            {
+                <tr>
+                    <td>@article.Name</td>
+                    <td>@article.Price.ToString("C", new System.Globalization.CultureInfo("en-US"))</td>
+                    <td>
+                        @(
+                            Model.Categories.TryGetValue(article.CategoryId, out var categoryName)
+                            ? categoryName
+                            : "No category"
+                            )
+                    </td>
+                    <td>
+                        <img src="@(string.IsNullOrEmpty(article.ImagePath) ? Url.Content("~/image/NoImage.png") : Url.Content(article.ImagePath))"
+                             alt="Image of @article.Name"
+                             style="width: 50px; height: auto; object-fit: cover;" />
+                    </td>
+                    <td class="text-center">@article.Quantity</td>
+                    <td>
+                        <form method="get" asp-page="/Store/Cart" asp-page-handler="UpdateCart" style="display: inline-block;">
+                            <input type="hidden" name="articleId" value="@article.ArticleId" />
+                            <input type="hidden" name="quantity" value="@(@article.Quantity + 1)" />
+                            <button type="submit" class="btn btn-success" style="width: 90px;">Increase</button>
+                        </form>
+
+                        <form method="get" asp-page="/Store/Cart" asp-page-handler="UpdateCart" style="display: inline-block;">
+                            <input type="hidden" name="articleId" value="@article.ArticleId" />
+                            <input type="hidden" name="quantity" value="@(@article.Quantity - 1)" />
+                            <button type="submit" class="btn btn-primary" style="width: 90px;">Decrease</button>
+                        </form>
+
+                        <form method="get" asp-page="/Store/Cart" asp-page-handler="RemoveFromCart" style="display: inline-block;">
+                            <input type="hidden" name="articleId" value="@article.ArticleId" />
+                            <button type="submit" class="btn btn-danger" style="width: 90px;">Delete</button>
+                        </form>
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="mt-4">
+        <strong>Total Sum:</strong>
+        @Model.Articles.Sum(a => a.Quantity * a.Price).ToString("C", new System.Globalization.CultureInfo("en-US"))
+    </div>
+
+    <div>
+        <a asp-page="/Store/Index" class="btn btn-primary" style="width: 150px; margin-top: 20px;">Back to Store</a>
+    </div>
+
+    @if (User.Identity.IsAuthenticated && !User.IsInRole("Admin"))
+    {
+        <div>
+            <a asp-page="/Store/Order" class="btn btn-success margin-top margin-top" style="width: 150px;">Make an order</a>
+        </div>
+    }
+}

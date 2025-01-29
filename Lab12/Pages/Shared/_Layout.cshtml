@@ -1,0 +1,92 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Lab12</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Lab12.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-page="">Lab12</a>
+                <div class="collapse navbar-collapse">
+                    <ul class="navbar-nav flex-grow-1">
+                        <a class="nav-link" asp-page="/Store/Index">Store</a>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a class="nav-link" asp-page="/Categories/Index">Categories</a>
+                        }
+                        @if (!User.IsInRole("Admin"))
+                        {
+                            <a class="nav-link" asp-page="/Store/Cart">Cart</a>
+                        }
+                    </ul>
+
+                    @if (Context.Request.Path.Value.Contains("/Store") && 
+                    !Context.Request.Path.Value.Contains("/Store/Cart") &&
+                    !Context.Request.Path.Value.Contains("/Store/Order") &&
+                    !Context.Request.Path.Value.Contains("/Store/OrderConfirmation")
+                    )
+                    { 
+                        <div class="mx-auto d-flex justify-content-center">
+                            <form method="get" asp-page="/Store/Index" class="d-flex align-items-center">
+                                <select id="category-select" name="categoryId" class="form-select" onchange="this.form.submit();">
+                                    <option value="">All categories</option>
+                                    @if (ViewData["Categories"] != null)
+                                    {
+                                        var categories = (Dictionary<int, string>)ViewData["Categories"];
+                                        foreach (var category in categories)
+                                        {
+                                            if (ViewBag.SelectedCategoryId != null && (int)ViewBag.SelectedCategoryId == category.Key)
+                                            {
+                                                <option value="@category.Key" selected>@category.Value</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@category.Key">@category.Value</option>
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <option disabled>No categories</option>
+                                    }
+                                </select>
+                            </form>
+                        </div>
+                    }
+
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
+        </nav>
+    </header>
+
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer">
+        <div class="container">
+            &copy; 2025 - Lab12
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

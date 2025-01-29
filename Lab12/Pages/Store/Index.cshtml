@@ -1,0 +1,133 @@
+﻿@page
+@model Lab12.Pages.Store.IndexModel
+
+@{
+    ViewData["Title"] = "Store";
+}
+
+<h1>Articles</h1>
+<form method="post" id="csrfForm" style="display:none;">
+    @Html.AntiForgeryToken()
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Category</th>
+            <th>Image</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id="articles-container"></tbody>
+</table>
+
+@if (User.IsInRole("Admin"))
+{
+	<div class="text-center mt-3">
+		<a asp-page="/Articles/Create" class="btn btn-success mt-3" style="width: 170px;">Create New Article</a>
+	</div>
+}
+
+<div class="text-center mt-3">
+    <button id="load-more" class="btn btn-primary load-more" style="width: 170px;" onclick="loadMore(5)">Load More</button>
+</div>
+
+<script>
+    let offset = 0;
+    const isUserAdmin = @User.IsInRole("Admin").ToString().ToLower();
+
+    loadMore(10);
+
+    function loadMore(limit) {
+
+        fetch(`/api/articles/articlesPage?offset=${offset}&limit=${limit}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error while downloading data');
+            }
+            return response.json();
+        })
+        .then(articles => {
+            const tableBody = document.getElementById('articles-container');
+
+            console.log(articles);
+
+            articles.forEach(article => {
+                const formattedPrice = new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                }).format(article.price);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${article.name}</td>
+                    <td>${formattedPrice}</td> 
+                    <td>${article.categoryName || 'No category'}</td>
+                    <td>
+                        <img src="${article.imagePath ? article.imagePath : '/image/NoImage.png'}" alt="Image of ${article.name}"
+                        style="width: 50px; height: auto; object-fit: cover;" />
+                    </td>
+                    <td>
+                        ${isUserAdmin ? `
+                            <a href="/Articles/Details?id=${article.id}" class="btn btn-primary" style="width: 80px; display: inline-block;">Details</a>
+                            <a href="/Articles/Edit?id=${article.id}" class="btn btn-success" style="width: 80px; display: inline-block;">Edit</a>
+                            <a href="/Articles/Delete?id=${article.id}" class="btn btn-danger" style="width: 80px; display: inline-block;">Delete</a>
+                        ` : `
+                            <button class="btn btn-success" style="width: 110px;" data-article-id="${article.id}" onclick="addToCart(this)">Add to cart</button>
+                            <a href="/Articles/Details?id=${article.id}" class="btn btn-primary" style="width: 80px; display: inline-block;">Details</a>
+                            `}
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            offset += articles.length;
+        })
+        .catch(error => console.log(error));
+    }
+
+    function addToCart(buttonElement) {
+        const articleId = parseInt(buttonElement.getAttribute('data-article-id'), 10);
+        console.log("Sending articleId:", articleId); 
+
+        const token = getCsrfToken();
+        if (!token) {
+            console.error("CSRF token not found!");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('articleId', articleId);
+        formData.append('__RequestVerificationToken', token);
+
+        fetch("/Store?handler=AddToCart", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(error => {
+                    console.error("Error adding item to cart:", error);
+                    throw new Error("Error adding item to cart");
+                });
+            }
+            return response.text();
+        })
+        .then(data => {
+            console.log("Added to cart");
+        })
+        .catch(error => console.error("Error:", error));
+    }
+
+    function getCsrfToken() {
+        const tokenField = document.querySelector("input[name='__RequestVerificationToken']");
+        if (!tokenField) {
+            console.error("CSRF token field not found!");
+            return null;
+        }
+        return tokenField.value;
+    }
+
+</script>

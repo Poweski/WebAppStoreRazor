@@ -1,0 +1,72 @@
+﻿@page
+@model Lab12.Pages.Store.OrderModel
+
+@{
+    ViewData["Title"] = "Order Summary";
+}
+
+<h4>Order Summary</h4>
+
+@if (Model.Articles.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var article in Model.Articles)
+            {
+                <tr>
+                    <td>@article.Name</td>
+                    <td>@article.Price.ToString("C", new System.Globalization.CultureInfo("en-US"))</td>
+                    <td>@article.Quantity</td>
+                    <td>@article.Total.ToString("C", new System.Globalization.CultureInfo("en-US"))</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="mt-4">
+        <strong>Total Order Amount:</strong>
+        @Model.Articles.Sum(a => a.Total).ToString("C", new System.Globalization.CultureInfo("en-US"))
+    </div>
+
+    <h4 style="margin-top: 30px;">Personal Information and Delivery Address</h4>
+    <form method="post" asp-page="/Store/Order" class="mt-4">
+        <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input type="text" id="firstName" name="FirstName" class="form-control" required />
+        </div>
+        <div class="form-group mt-3">
+            <label for="lastName">Last Name</label>
+            <input type="text" id="lastName" name="LastName" class="form-control" required />
+        </div>
+        <div class="form-group mt-3">
+            <label for="address">Delivery Address</label>
+            <textarea id="address" name="Address" class="form-control" required></textarea>
+        </div>
+
+        <div class="form-group mt-3">
+            <label for="paymentMethod">Payment Method</label>
+            <select id="paymentMethod" name="PaymentMethod" class="form-control" required>
+                <option value="CreditCard">Credit Card</option>
+                <option value="PayPal">PayPal</option>
+                <option value="Blik">Blik</option>
+                <option value="BankTransfer">Bank Transfer</option>
+            </select>
+        </div>
+
+        <div>
+            <a asp-page="/Store/Index" class="btn btn-primary" style="width: 150px; margin-top: 20px;">Back to Store</a>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-success" style="width: 150px;">Confirm Order</button>
+        </div>
+    </form>
+}

@@ -1,0 +1,62 @@
+﻿@page
+@model Lab12.Pages.Store.OrderConfirmationModel
+
+@{
+    ViewData["Title"] = "Order Confirmation";
+}
+
+<h4>Order Confirmation</h4>
+
+<div>
+    <div class="row" style="margin-top: 30px;">
+        <div class="col-md-4">
+            <h5>Personal Information:</h5>
+            <p><strong>First Name:</strong> @Model.FirstName</p>
+            <p><strong>Last Name:</strong> @Model.LastName</p>
+            <p><strong>Address:</strong> @Model.Address</p>
+        </div>
+
+        <div class="col-md-4">
+            <h5>Payment Method:</h5>
+            <p>@Model.PaymentMethod</p>
+        </div>
+
+        <div class="col-md-4">
+            <h5>Total Order Amount:</h5>
+            <p>@Model.TotalAmount.ToString("C", new System.Globalization.CultureInfo("en-US"))</p>
+        </div>
+    </div>
+
+    <h5 style="margin-top: 30px;">Order Summary:</h5>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var article in Model.Articles)
+            {
+                <tr>
+                    <td>@article.Name</td>
+                    <td>@article.Price.ToString("C", new System.Globalization.CultureInfo("en-US"))</td>
+                    <td>@article.Quantity</td>
+                    <td>@article.Total.ToString("C", new System.Globalization.CultureInfo("en-US"))</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div>
+        <a asp-page="/Store/Order" class="btn btn-primary" style="width: 150px;">Back</a>
+    </div>
+
+    <form method="post" asp-page-handler="ConfirmOrder">
+        <div class="mt-4">
+            <button type="submit" class="btn btn-success" style="width: 150px;">Confirm Order</button>
+        </div>
+    </form>
+</div>

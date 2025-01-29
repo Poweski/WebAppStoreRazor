@@ -1,0 +1,77 @@
+﻿@page
+@model Lab12.Pages.Articles.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4" style="width: 400px">
+        <form enctype="multipart/form-data" asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Article.Name" class="control-label"></label>
+                <input asp-for="Article.Name" class="form-control" />
+                <span asp-validation-for="Article.Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Article.Price" class="control-label"></label>
+                <input asp-for="Article.Price" class="form-control" />
+                <span asp-validation-for="Article.Price" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Article.CategoryId" class="control-label">Category</label>
+                <select asp-for="Article.CategoryId" class="form-select form-control-lg" style="width: 100%;">
+                    <option value="" disabled selected>Select a category</option>
+                    @if (ViewBag.Categories != null)
+                    {
+                        foreach (var category in (Dictionary<int, string>)ViewBag.Categories)
+                        {
+                            <option value="@category.Key">@category.Value</option>
+                        }
+                    }
+                    else
+                    {
+                        <option disabled>No categories available</option>
+                    }
+                </select>
+                <span asp-validation-for="Article.CategoryId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Image</label>
+                <input type="file" id="ImageFile" name="ImageFile" class="form-control" accept="image/*" onchange="previewImage(event)" style="width: 100%; max-width: 500px;" />
+                <span class="text-muted">Supported formats: JPEG, PNG, GIF</span>
+                <div class="mt-3">
+                    <p>Preview:</p>
+                    <img id="imagePreview" src="#" alt="No image selected" style="width: 200px; max-height: 300px; display: none;" />
+                </div>
+            </div>
+
+            <div class="form-group margin-top" style="width: 150px;">
+                <input type="submit" value="Create" class="btn btn-success" style="width: 150px;"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="/Store/Index" class="btn btn-primary margin-top margin-top" style="width: 150px;">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        function previewImage(event) {
+            const output = document.getElementById('imagePreview');
+            output.style.display = 'block';
+            output.src = URL.createObjectURL(event.target.files[0]);
+        }
+    </script>
+}

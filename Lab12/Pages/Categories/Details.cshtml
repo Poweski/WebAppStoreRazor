@@ -1,0 +1,27 @@
+﻿@page
+@model Lab12.Pages.Categories.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            Name
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Category.Name)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="/Categories/Edit" asp-route-id="@Model?.Category.Id" class="btn btn-primary btn-spacing margin-top" style="width: 150px;">Edit</a>
+</div>
+<div>
+    <a asp-page="/Categories/Index" class="btn btn-primary margin-top" style="width: 150px;">Back to List</a>
+</div>
+
